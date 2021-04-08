@@ -11,7 +11,6 @@ module.exports = {
                 }
                 connection.query(sql, function (err, result) {
                     if (err) {
-                        connection.end();
                         reject(JSON.stringify(err));
                     }
                     resolve(result);

@@ -49,19 +49,19 @@ router.post('/codelogin', function (req, res) {
     } = req.session.user;
     const { phonenumber: bodyPhoneNumber = null, verifyCode: bodyVerifyCode = null } = req.body;
     if (!sessionVerifyCode) {
-        res.send({
+        return res.send({
             code: RES_CODES.ERROR,
             msg: RES_MSGS.CODE_TIMEOUT
         });
     }
     if (bodyPhoneNumber !== sessionPhoneNumber) {
-        res.send({
+        return res.send({
             code: RES_CODES.ERROR,
             msg: RES_MSGS.WRON_PHONE_NUMBER
         });
     }
     if (bodyVerifyCode !== sessionVerifyCode) {
-        res.send({
+        return res.send({
             code: RES_CODES.ERROR,
             msg: RES_MSGS.WRON_CODE
         });
