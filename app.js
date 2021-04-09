@@ -18,4 +18,6 @@ const login = require('./routes/login');
 app.use(login);
 const sign = require('./routes/sign');
 app.use(sign);
+const editpwd = require('./routes/editpwd');
+app.use(editpwd);
 app.listen(80);

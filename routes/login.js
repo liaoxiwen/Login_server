@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const md5 = require('md5');
 const { DOMAINS, RES_CODES, RES_MSGS, VALID_TIME } = require('../utils/Enum');
 const db = require('../utils/database');
-const createcode = require('../utils/createcode');
+const { createcode } = require('../utils/createcode');
 const router = express.Router();
 
 router.use(session({
@@ -85,18 +85,14 @@ router.post('/code', function (req, res) {
                 msg: RES_MSGS.NO_USER
             });
         }
-        const verifyCode = createcode.createcode();
+        const verifyCode = createcode();
         const { username = null, phonenumber = null } = response[0];
         const user = {
             username,
             phonenumber,
             verifyCode: md5(verifyCode)
         };
-        console.log(req.session);
-        // req.session = {...req.session, user};
         req.session.user = user;
-        // console.log(req.session);
-        
         res.send({
             code: RES_CODES.SUCCESS,
             data: verifyCode

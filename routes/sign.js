@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../utils/database');
-const { password } = require('../utils/database.config');
 const { RES_CODES } = require('../utils/Enum');
+const uuid = require('node-uuid');
 
 router.post('/sign', async function (req, res) {
-    const { username = null, phonenumber = null, email = null } = req.body;
-    let findSql = `select * from user where phonenumber='${phonenumber}' or email='${email}'`;
-    console.log(findSql);
+    const { username = null, phonenumber = null, email = null, password = null } = req.body;
+    let findSql = `select username from user where phonenumber='${phonenumber}' or email='${email}'`;
     try {
         var findResult = await db.query(findSql);
     } catch (err) {
+        res.status(500);
         return res.send({
             code: RES_CODES.ERROR,
             msg: err
@@ -23,10 +23,11 @@ router.post('/sign', async function (req, res) {
         });
     }
 
-    findSql = `select * from user where username='${username}'`;
+    findSql = `select id from user where username='${username}'`;
     try {
         findResult = await db.query(findSql);
     } catch (err) {
+        res.status(500);
         return res.send({
             code: RES_CODES.ERROR,
             msg: err
@@ -38,20 +39,20 @@ router.post('/sign', async function (req, res) {
             msg: '用户名已存在'
         });
     }
-
-    const insertSql = `insert into user(username,phonenumber,email,password) values ('${username}','${phonenumber}','${email}','${password}')`;
+    const userid = uuid.v1();
+    const insertSql = `insert into user(id,username,phonenumber,email,password) values ('${userid}','${username}','${phonenumber}','${email}','${password}')`;
     try {
         await db.query(insertSql);
-        res.send({
+        return res.send({
             code: RES_CODES.SUCCESS,
             msg: '注册成功'
         });
     } catch (err) {
+        res.status(500);
         return res.send({
             code: RES_CODES.ERROR,
             msg: err
         });
     }
-
 })
 module.exports = router;
