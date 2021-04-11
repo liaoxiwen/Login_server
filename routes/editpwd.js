@@ -38,6 +38,5 @@ router.post('/editpwd',async function (req, res) {
             msg: err
         })
     }
-    
 })
 module.exports = router;

@@ -8,24 +8,30 @@ router.post('/sign', async function (req, res) {
     const { username = null, phonenumber = null, email = null, password = null } = req.body;
     let findSql = `select username from user where phonenumber='${phonenumber}' or email='${email}'`;
     try {
-        var findResult = await db.query(findSql);
+        const findResult = await db.query(findSql);
+        if (findResult.length !== 0) {
+            return res.send({
+                code: RES_CODES.ERROR,
+                msg: '该手机号或邮箱号已被注册'
+            });
+        }
     } catch (err) {
         res.status(500);
         return res.send({
             code: RES_CODES.ERROR,
             msg: err
-        });
-    }
-    if (findResult.length !== 0) {
-        return res.send({
-            code: RES_CODES.ERROR,
-            msg: '该手机号或邮箱号已被注册'
         });
     }
 
     findSql = `select id from user where username='${username}'`;
     try {
-        findResult = await db.query(findSql);
+        const findResult = await db.query(findSql);
+        if (findResult.length !== 0) {
+            return res.send({
+                code: RES_CODES.ERROR,
+                msg: '用户名已存在'
+            });
+        }
     } catch (err) {
         res.status(500);
         return res.send({
@@ -33,12 +39,7 @@ router.post('/sign', async function (req, res) {
             msg: err
         });
     }
-    if (findResult.length !== 0) {
-        return res.send({
-            code: RES_CODES.ERROR,
-            msg: '用户名已存在'
-        });
-    }
+
     const userid = uuid.v1();
     const insertSql = `insert into user(id,username,phonenumber,email,password) values ('${userid}','${username}','${phonenumber}','${email}','${password}')`;
     try {

@@ -66,8 +66,8 @@ router.post('/codelogin', function (req, res) {
             msg: RES_MSGS.WRON_CODE
         });
     }
-    const secret = 'logintoken';
-    const token = jwt.sign({ username }, secret, { expiresIn: VALID_TIME.TOKEN_TIME });
+    const secret = 'logintoken';  // token密钥
+    const token = jwt.sign({ username }, secret, { expiresIn: VALID_TIME.TOKEN_TIME });  // 生成token
     res.send({
         code: RES_CODES.SUCCESS,
         msg: RES_MSGS.LOGIN_SUCCESS,
@@ -75,31 +75,32 @@ router.post('/codelogin', function (req, res) {
     });
 })
 
-router.post('/code', function (req, res) {
-    const { phonenumber } = req.body;
-    const sql = `select * from user where phonenumber='${phonenumber}'`;
-    db.query(sql).then((response) => {
-        if (response.length === 0) {
-            res.send({
-                code: RES_CODES.ERROR,
-                msg: RES_MSGS.NO_USER
-            });
-        }
-        const verifyCode = createcode();
-        const { username = null, phonenumber = null } = response[0];
-        const user = {
-            username,
-            phonenumber,
-            verifyCode: md5(verifyCode)
-        };
-        req.session.user = user;
-        res.send({
-            code: RES_CODES.SUCCESS,
-            data: verifyCode
-        });
-    }).catch((err) => {
+router.post('/code', async function (req, res) {
+    const { phonenumber:bodyPhoneNumber = null } = req.body;
+    const sql = `select * from user where phonenumber='${bodyPhoneNumber}'`;
+    try {
+        var response = await db.query(sql);
+    } catch (err) {
         res.status(500);
         res.send({ err });
-    })
+    }
+    if (response.length === 0) {
+        res.send({
+            code: RES_CODES.ERROR,
+            msg: RES_MSGS.NO_USER
+        });
+    }
+    const verifyCode = createcode(); // 生成验证码
+    const { username = null, phonenumber = null } = response[0];
+    const user = {
+        username,
+        phonenumber,
+        verifyCode: md5(verifyCode)
+    };
+    req.session.user = user;  // 将验证码保存到session里面
+    res.send({
+        code: RES_CODES.SUCCESS,
+        data: verifyCode
+    });
 })
 module.exports = router;

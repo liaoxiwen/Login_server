@@ -9,7 +9,7 @@ module.exports = {
     },
 
     RES_MSGS: {
-        LOGIN_SUCCESS: '登陆成功',
+        LOGIN_SUCCESS: '登录成功',
         NO_USER: '用户不存在',
         CODE_TIMEOUT: '验证码已过期',
         WRON_PHONE_NUMBER: '手机号错误',
